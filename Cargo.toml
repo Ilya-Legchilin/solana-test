@@ -1,5 +1,5 @@
 [package]
-name = "spl-example-transfer-lamports"
+name = "test_aloha"
 version = "1.0.0"
 description = "Solana Program Library Transfer Lamports Example"
 authors = ["Solana Maintainers <maintainers@solana.foundation>"]
@@ -13,6 +13,7 @@ test-bpf = []
 
 [dependencies]
 solana-program = "1.8.1"
+borsh = "0.9.1"
 
 [dev-dependencies]
 solana-program-test = "1.8.1"
