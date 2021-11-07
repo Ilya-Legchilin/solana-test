@@ -49,7 +49,7 @@ pub fn process_instruction(
     let payer_key = payer_info.key;
     if **allocated_x_info.try_borrow_mut_lamports()? == 0 {
         invoke_signed(
-            &system_instruction::create_account(payer_key, allocated_x_info.key, x, SIZE as u64, system_program_info.key),
+            &system_instruction::create_account(payer_key, allocated_x_info.key, x, SIZE as u64, &program_id),
             &[
                 payer_info.clone(),
                 allocated_x_info.clone(),
@@ -59,7 +59,7 @@ pub fn process_instruction(
     }
     if **allocated_y_info.try_borrow_mut_lamports()? == 0 {
         invoke_signed(
-            &system_instruction::create_account(payer_key, allocated_y_info.key, y, SIZE as u64, system_program_info.key),
+            &system_instruction::create_account(payer_key, allocated_y_info.key, y, SIZE as u64, &program_id),
             &[
                 payer_info.clone(),
                 allocated_y_info.clone(),
@@ -67,14 +67,6 @@ pub fn process_instruction(
             &[&[b"You pass butter y", &[254]]],
         )?;
     }
-    invoke_signed(
-       &system_instruction::assign(allocated_y_info.key, &program_id),
-       &[
-           payer_info.clone(),
-           allocated_y_info.clone(),
-       ],
-       &[&[b"You pass butter y", &[254]]],
-    )?;
 
     let k = x * y;
     let dy = y - k/(x + amount);
