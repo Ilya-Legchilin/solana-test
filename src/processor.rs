@@ -23,6 +23,8 @@ pub struct Data {
     pub y: u64,
 }
 
+pub const SIZE: usize = 42;
+
 /// Instruction processor
 pub fn process_instruction(
     _program_id: &Pubkey,
@@ -39,36 +41,39 @@ pub fn process_instruction(
     let allocated_y_info = next_account_info(account_info_iter)?;
     let Data {
         program_id,
-        flag, 
-        amount, 
-        x, 
-        y, 
+        flag,
+        amount,
+        x,
+        y,
     } = Data::try_from_slice(instruction_data)?;
     let payer_key = payer_info.key;
-    
+    if **allocated_x_info.try_borrow_mut_lamports()? == 0 {
+        invoke_signed(
+            &system_instruction::create_account(payer_key, allocated_x_info.key, x, SIZE as u64, system_program_info.key),
+            &[
+                payer_info.clone(),
+                allocated_x_info.clone(),
+            ],
+            &[&[b"You pass butter x", &[255]]],
+        )?;
+    }
+    if **allocated_y_info.try_borrow_mut_lamports()? == 0 {
+        invoke_signed(
+            &system_instruction::create_account(payer_key, allocated_y_info.key, y, SIZE as u64, system_program_info.key),
+            &[
+                payer_info.clone(),
+                allocated_y_info.clone(),
+            ],
+            &[&[b"You pass butter y", &[254]]],
+        )?;
+    }
     invoke_signed(
-        &system_instruction::transfer(payer_key, allocated_x_info.key, x),
-        &[
-            payer_info.clone(),
-            allocated_x_info.clone(),
-        ],
-        &[&[b"You pass butter x", &[255]]],
-    )?;
-    invoke_signed(
-        &system_instruction::transfer(payer_key, allocated_y_info.key, y),
-        &[
-            payer_info.clone(),
-            allocated_y_info.clone(),
-        ],
-        &[&[b"You pass butter y", &[254]]],
-    )?;
-    invoke_signed(
-        &system_instruction::assign(allocated_y_info.key, &program_id),
-        &[
-            payer_info.clone(),
-            allocated_y_info.clone(),
-        ],
-        &[&[b"You pass butter y", &[254]]],
+       &system_instruction::assign(allocated_y_info.key, &program_id),
+       &[
+           payer_info.clone(),
+           allocated_y_info.clone(),
+       ],
+       &[&[b"You pass butter y", &[254]]],
     )?;
 
     let k = x * y;
